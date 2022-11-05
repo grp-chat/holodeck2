@@ -195,7 +195,7 @@ class numAndIdCommand {
 const allCommands = [
     new idCommand("TCR: winner ", 'winner'),
     new freeNumCommand(nickname + ": pw ", 'unlockUsingPassword'),
-    new freeNumCommand(nickname + ": use power ", 'usePower'),
+    new freeNumCommand(nickname + ": p", 'usePower'),
     new numAndIdCommand("TCR: grant power ", 'grantPower'),
     new idCommand("TCR: mind control ", 'mindControl'),
     new numAndIdCommand("TCR: +", 'addSteps'),
