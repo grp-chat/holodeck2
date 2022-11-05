@@ -24,8 +24,8 @@ class GridSystemClient {
         this.playersArr = config.playersArr;
 
         this.teams = {
-            "1": {line: 0, prefix: "🟥:", playerString: ""},
-            "2": {line: 15, prefix: "🟦:", playerString: ""},
+            "1": {line: 0, prefix: "👨‍🚀:", playerString: ""},
+            "2": {line: 15, prefix: "👽:", playerString: ""},
             "3": {line: 30, prefix: "🟩:",playerString: ""}
         }
 

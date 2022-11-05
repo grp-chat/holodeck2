@@ -12,7 +12,7 @@ class Player {
 
         this.invisibleColor = "rgba(0,0,0,0.2)";
         this.invisibilitySteps = 0;
-        this.invisibilityStepsDefault = 15;
+        this.invisibilityStepsDefault = 20;
 
         this.originColor = this.color;
         this.originX = config.x;

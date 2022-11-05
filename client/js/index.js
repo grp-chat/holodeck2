@@ -9,7 +9,7 @@ const promptMsg = () => {
     const sat4pmStudents = ["JX", "JZ", "TWN", "LJY", "LSH", "ELI", "CUR", "CT", "RYD"];
 
     const studentLogins = {
-        teacher: { pinNumber: '8', nickname: 'TCR' },
+        teacher: { pinNumber: '5566', nickname: 'TCR' },
         len: { pinNumber: '1502', nickname: 'LEN' },
 
         sat2pmStudent1: { pinNumber: '9852', nickname: 'LK' },
