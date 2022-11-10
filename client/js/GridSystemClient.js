@@ -15,7 +15,11 @@ class GridSystemClient {
         //this.chatContext = this.getContext(1000, 580, "transparent", false);
 
         this.cellSize = 27;
+        this.cellSizeBuffer = 1;
         this.padding = 2;
+        this.strokeBuffer = 29;
+        this.strokeThickness = 1.7;
+
         
         this.students = config.extraArr;
 
@@ -72,7 +76,8 @@ class GridSystemClient {
     uiContextSettings() {
         this.uiContext.canvas.width = 1000;
         this.uiContext.canvas.height = 680;
-        this.uiContext.canvas.style.background = "#111";
+        //this.uiContext.canvas.style.background = "#111";
+        this.uiContext.canvas.style.background = "transparent";
         //const center = this.getCenter(this.uiContext.canvas.width, this.uiContext.canvas.height);
         this.uiContext.canvas.style.marginLeft = "-8px";
         this.uiContext.canvas.style.marginTop = "-12px";
@@ -88,8 +93,8 @@ class GridSystemClient {
         const center = this.getTopLeftFromUIContext();
         this.outlineContext.canvas.style.marginLeft = center.x;
         this.outlineContext.canvas.style.marginTop = center.y;
-        //this.outlineContext.canvas.style.background = "transparent";
-        this.outlineContext.canvas.style.background = "#333";
+        this.outlineContext.canvas.style.background = "transparent";
+        // this.outlineContext.canvas.style.background = "#333";
     }
     topContextSettings() {
         this.topContext.canvas.width = 270;
@@ -176,6 +181,7 @@ class GridSystemClient {
 
     setColorAndId(cellVal) {
         let color = "#111";
+        //let color = "transparent";
         let playerId = null;
         let itemId = null;
 
@@ -203,10 +209,23 @@ class GridSystemClient {
     }
     renderBlankCell(cellDetail, row, col) {
         //this.outlineContext.globalAlpha = 0.2;
+        //const fillStyle = "transparent";
         this.outlineContext.fillStyle = cellDetail.color;
+        //this.outlineContext.fillStyle = "transparent";
+        //this.uiContext.fillStyle = fillStyle;
         this.outlineContext.fillRect(col * (this.cellSize + this.padding),
             row * (this.cellSize + this.padding),
-            this.cellSize, this.cellSize);
+            this.cellSize + this.cellSizeBuffer, this.cellSize + this.cellSizeBuffer);
+
+        this.outlineContext.strokeStyle = "#333";
+        //this.outlineContext.strokeStyle = "transparent";
+        this.outlineContext.lineWidth = this.strokeThickness;
+        this.outlineContext.strokeRect(col * (this.cellSize + this.padding),
+            row * (this.cellSize + this.padding),
+            this.cellSize + this.padding + this.strokeBuffer, this.cellSize + this.padding + this.strokeBuffer);
+
+        
+        
     }
     renderPlayers(cellDetail, row, col) {
 
@@ -254,8 +273,8 @@ class GridSystemClient {
         const redDoorCoords = this.redDoorCoords;
         redDoorCoords.forEach(door => {
             this.outlineContext.fillStyle = "red";
-            this.outlineContext.fillRect(door.x * (this.cellSize + this.padding),
-                door.y * (this.cellSize + this.padding), this.cellSize, this.cellSize);
+            this.outlineContext.fillRect(door.x * (this.cellSize + this.padding) + 1,
+                door.y * (this.cellSize + this.padding) + 1, this.cellSize, this.cellSize);
 
         });
     }

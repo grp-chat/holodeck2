@@ -10,9 +10,11 @@ class Player {
         this.area = config.area || "area1";
         this.color = config.color || "grey";
 
-        this.invisibleColor = "rgba(0,0,0,0.2)";
+        this.invisibleColor = "#222";
         this.invisibilitySteps = 0;
         this.invisibilityStepsDefault = 20;
+
+        this.blinkActivate = false;
 
         this.originColor = this.color;
         this.originX = config.x;
@@ -68,7 +70,13 @@ class Player {
             this.invisible = false;
             this.canUsePower = true;
         }
-        
+    }
+
+    activateBlink () {
+        this.blinkActivate = true;
+    }
+    deactivateBlink() {
+        this.blinkActivate = false;
     }
 
 }

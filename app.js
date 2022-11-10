@@ -50,11 +50,18 @@ class GridSystem {
         //this.startingSteps = 500;
         this.maxSteps = 150;
         this.keyCodes = {
-            37: {x: -1, y: 0},
-            39: {x: 1, y: 0},
-            38: {x: 0, y: -1},
-            40: {x: 0, y: 1},
+            37: {x: -1, y: 0, blinkX: -2, blinkY: 0},
+            39: {x: 1, y: 0, blinkX: 2, blinkY: 0},
+            38: {x: 0, y: -1, blinkX: 0, blinkY: -2},
+            40: {x: 0, y: 1, blinkX: 0, blinkY: 2}
         }
+        this.keyCodesBlink = {
+            37: {x: -2, y: 0},
+            39: {x: 2, y: 0},
+            38: {x: 0, y: -2},
+            40: {x: 0, y: 2}
+        }
+        
         this.teamSlots1 = [];
         this.teamSlots2 = [];
         this.team1OriginPosition = [
@@ -74,13 +81,13 @@ class GridSystem {
         ];
 
         //this.extraArr = ["TCR", "LOK", "LK", "JHA", "JV", "CJH", "SZF", "JHA", "TJY", "KX"];
-        //this.extraArr = ["TCR", "JX", "JZ", "TWN", "LJY", "ELI", "CUR", "RYD", "CT", "LK", "JV"];
-        this.extraArr = ["TCR", "LOK", "JHA", "KN", "JT", "CJH", "CED", "KX", "TJY", "LSH", "SZF"];
+        this.extraArr = ["TCR", "JX", "JZ", "TWN", "LJY", "ELI", "CUR", "RYD", "CT", "LK", "JV"];
+        //this.extraArr = ["TCR", "LOK", "JHA", "KN", "JT", "CJH", "CED", "KX", "TJY", "LSH", "SZF"];
 
         //this.p1 = { x: 1, y: 1, lable: 2, id: this.extraArr[0], steps: this.startingSteps, area: "mainArea", wallet: 0, total: 0, storeSteps: 1000 };
         // this.playersArr = [this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.p9, this.p10];
         this.playersArr = [
-            this.p1 = new Player({x: 16, y: 7, lable: 2, id: this.extraArr[0], area: "area2", color: "grey", startingSteps: 500}),
+            this.p1 = new Player({x: 16, y: 7, lable: 13, id: this.extraArr[0], area: "area2", color: "grey", startingSteps: 500}),
 
             this.p2 = new Player({x: 16, y: 8, lable: 3, id: this.extraArr[1], area: "area2", color: "springgreen"}),
             this.p3 = new Player({x: 16, y: 9, lable: 4, id: this.extraArr[2], area: "area2", color: "orange"}),
@@ -96,6 +103,7 @@ class GridSystem {
 
         this.itemsArr = [
             this.item1 = new Item({itemLable: 1, itemId: "", color: "#4488FF", returnValue: false}),
+            //this.item1 = new Item({itemLable: 1, itemId: "", color: "transparent", returnValue: false}),
             this.item2 = new Item({itemLable: 20, itemId: "🌀", returnValue: false}),
             // this.item3 = new Item({itemLable: 21, itemId: "🌱"}),
             // this.item4 = new Item({itemLable: 22, itemId: "🔩"}),
@@ -111,7 +119,7 @@ class GridSystem {
 
         this.powerList = {
             1: {powerName: "invisibility", duration: 10000, offPowerName: "invisibilityOff", title: "Invisibility"},
-            2: {powerName: "scanner"},
+            2: {powerName: "blink", title: "Blink"},
         }
 
         this.playersArr.forEach((player) => {
@@ -126,6 +134,9 @@ class GridSystem {
     }
     isValidMove(plyrSlot, x, y) {
         this.matrix = this.allMatrixes[plyrSlot.area].gridMatrix;
+
+        if(plyrSlot.y + y < 0) return false;
+        if(plyrSlot.x + x < 0) return false;
 
         const cellVal = this.matrix[plyrSlot.y + y][plyrSlot.x + x];
 
@@ -237,10 +248,16 @@ class GridSystem {
         
         this.updMatrixForPlayerAtThisSpot(plyrSlot)
     }
-    updPosition(keyCode, plyrSlot) {
+    updPosition(keyCode, plyrSlot, mode) {
 
         if (this.keyCodes[keyCode] === undefined) return;
-        const value = this.keyCodes[keyCode];
+
+        const modes = {
+            "blink": this.keyCodesBlink[keyCode],
+            "move": this.keyCodes[keyCode]
+        }
+        const value = modes[mode];
+        
         this.matrix = this.allMatrixes[plyrSlot.area].gridMatrix;
         
         this.matrix[plyrSlot.y][plyrSlot.x] = 0;
@@ -284,10 +301,23 @@ class GridSystem {
     }
 
     movePlayer(keyCode, plyrSlot) {
+
+        if (plyrSlot.blinkActivate) {
+            plyrSlot.blinkActivate = false;
+            const blinkSuccess = this.isValidMove(plyrSlot, this.keyCodesBlink[keyCode].x, this.keyCodesBlink[keyCode].y)
+            if (this.keyCodesBlink[keyCode] === undefined) return;
+            if (blinkSuccess) {
+                const mode = "blink";
+                this.updPosition(keyCode, plyrSlot, mode);
+                io.emit('chat-to-clients', `Blink success!`);
+            } else if (!blinkSuccess) {io.emit('chat-to-clients', `Blink failed!`)}
+            return;
+        }
         
         if (this.keyCodes[keyCode] === undefined) return;
         if (this.isValidMove(plyrSlot, this.keyCodes[keyCode].x, this.keyCodes[keyCode].y)) {
-            this.updPosition(keyCode, plyrSlot);
+            const mode = "move"
+            this.updPosition(keyCode, plyrSlot, mode);
             plyrSlot.steps--;
             plyrSlot.invisibilityStepCheck();
         }
@@ -495,7 +525,20 @@ io.sockets.on('connection', function (sock) {
         const playerObjectKey = getPlayerObjectKey(data.playerId);
         const selectedPower = parseInt(data.extractNum) - 1
 
+        
+
         if(gridSystem[playerObjectKey].obtainedPowers[selectedPower] === undefined) return;
+
+        const displayPowerTitle = gridSystem[playerObjectKey].obtainedPowers[selectedPower].title;
+        io.emit('chat-to-clients', `${data.playerId} activated ${displayPowerTitle}`);
+
+        if (gridSystem[playerObjectKey].obtainedPowers[selectedPower].powerName === "blink") {
+            gridSystem[playerObjectKey].blinkActivate = true;
+            gridSystem[playerObjectKey].obtainedPowers.splice(selectedPower, 1);
+            return;
+        }
+
+        
         if(gridSystem[playerObjectKey].canUsePower === false) return;
 
 

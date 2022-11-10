@@ -9,7 +9,7 @@ const promptMsg = () => {
     const sat4pmStudents = ["JX", "JZ", "TWN", "LJY", "LSH", "ELI", "CUR", "CT", "RYD"];
 
     const studentLogins = {
-        teacher: { pinNumber: '5566', nickname: 'TCR' },
+        teacher: { pinNumber: '8', nickname: 'TCR' },
         len: { pinNumber: '1502', nickname: 'LEN' },
 
         sat2pmStudent1: { pinNumber: '9852', nickname: 'LK' },
@@ -78,6 +78,7 @@ let chatObjectsArr = [];
 let missionObjectArr = [];
 let matrixLengthXAxis = 0;
 let matrixLengthYAxis = 0;
+let keySafe = false;
 //let obtainedPowersArr = [];
 
 //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
@@ -146,10 +147,22 @@ function createChatDivs() {
     });
 
     chatInput.addEventListener("keyup", function (event) {
+        keySafe = false;
         if (event.keyCode === 13) {
             event.preventDefault();
             document.getElementById("chatBtn").click();
         }
+
+    });
+
+    chatInput.addEventListener("keydown", function (event) {
+        
+        if (!keySafe) {keySafe = true}
+        else if (event.keyCode != 8) {event.preventDefault()}
+        
+        if (event.keyCode === 16) {keySafe = false}
+        if (event.keyCode === 17) {keySafe = false}
+        
 
     });
 
@@ -241,8 +254,13 @@ document.addEventListener("keydown", (e) => {
     if ([37, 38, 39, 40].indexOf(e.keyCode) > -1) {
         e.view.event.preventDefault();
     }
+});
+document.addEventListener("keyup", (e) => {
+    if ([37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        sock.emit('keyPress', e.keyCode);
+    }
     //e.view.event.preventDefault();
-    sock.emit('keyPress', e.keyCode);
+    //sock.emit('keyPress', e.keyCode);
 });
 
 //============================================================================================================
